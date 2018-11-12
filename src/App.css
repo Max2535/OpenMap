@@ -8,5 +8,14 @@ body{
 }
 .map{
   height: 100%;
-  margin: 50px;
+}
+.message-form{
+  z-index: 999;
+  margin:10px ;
+  position: absolute;
+  top:0;
+  right: 0;
+}
+.search{  
+  width: 10%;
 }
