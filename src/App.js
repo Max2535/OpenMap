@@ -1,7 +1,15 @@
 import React, { Component } from "react";
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { Card, CardTitle } from "reactstrap";
+import {
+  Card,
+  CardTitle,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
+} from "reactstrap";
 import Autocomplete from "react-autocomplete";
 import "./App.css";
 
@@ -15,8 +23,60 @@ const myIcon = L.icon({
   shadowAnchor: [22, 44]
 });
 
+const brand = L.icon({
+  iconUrl:
+    "data:image/png;base64,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",
+  iconSize: [25, 41],
+  iconAnchor: [22, 44],
+  popupAnchor: [-3, -36],
+  shadowSize: [68, 45],
+  shadowAnchor: [22, 44]
+});
+
 let cur_lat = 0;
 let cur_lng = 0;
+
+//debug to state
+let markers = [
+  //lat:13.7481758,lng:100.6182162
+  {
+    position: [13.7481758, 100.6182162],
+    content: "My first popup"
+  },
+  {
+    position: [13.7484103,100.6207369],
+    content: "My second popup"
+  },
+  {
+    position: [13.7502752,100.6219909],
+    content: "My third popup"
+  }
+];
+
+class MyMarker extends Component {
+  render() {
+    const position = [this.props.lat, this.props.lng];
+    console.log(position);
+    return (
+      <Marker icon={brand} position={position}>
+        <Popup>
+          <a
+            href={`https://www.google.com/maps/dir/${cur_lat},${cur_lng}/
+              ${this.props.lat},${this.props.lng}`}
+            ref={el => {
+              if (el) {
+                this.anchorElement = el;
+              }
+            }}
+          >
+            <b>{this.props.title}</b>
+          </a>
+        </Popup>
+      </Marker>
+    );
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -28,13 +88,50 @@ class App extends Component {
       cur: true,
       title: "",
       haveUsersLocation: false,
+      modal: false,
       zoom: 3,
       value: "",
       arr: [{ display_name: "", lat: 0, lon: 0 }]
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.getLocation = this.getLocation.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.Search = this.Search.bind(this);
   }
+
+  //ค้นหาตาม lat,lng
+  async Search(query) {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${query}&format=json`
+    );
+    const json = await response.json();
+    this.setState({
+      location: {
+        lat: json[0].lat,
+        lng: json[0].lon
+      },
+      title: json[0].display_name,
+      cur: false,
+      haveUsersLocation: true,
+      zoom: 15
+    });
+  }
+  //กรณีปิด popup
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    });
+  }
+  //กรณีคลิกตามแผนที่
+  getLocation(e) {
+    var loc = e.latlng;
+    this.Search(loc.lat + "," + loc.lng);
+    this.setState({
+      modal: !this.state.modal
+    });
+  }
+  //ดึกข้อมูลตำแหน่งปัจจุบัน
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       position => {
@@ -69,9 +166,9 @@ class App extends Component {
       }
     );
   }
+  //แสดงผลลัพท์ค้นหาข้อมูลสถานที่ทั่งไป
   handleClick(value) {
     var data = this.state.arr.filter(e => e.display_name === value);
-    console.log(data);
     this.setState({
       cur: false,
       title: data[0].display_name,
@@ -82,8 +179,8 @@ class App extends Component {
       haveUsersLocation: true,
       zoom: 15
     });
-    console.log("handleClick:" + data);
   }
+  //กรณีที่ค้นหาข้อมูลสถานที่ทั่งไป
   handleChange(event) {
     this.setState({ value: event.target.value });
     this.setState({
@@ -119,10 +216,16 @@ class App extends Component {
   }
 
   render() {
-    const position = [this.state.location.lat, this.state.location.lng];
+    //const position = [this.state.location.lat, this.state.location.lng];
+    const position = [cur_lat,cur_lng];
     return (
       <div className="map">
-        <Map className="map" center={position} zoom={this.state.zoom}>
+        <Map
+          className="map"
+          onClick={e => this.getLocation(e)}
+          center={position}
+          zoom={this.state.zoom}
+        >
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -130,27 +233,19 @@ class App extends Component {
           {this.state.haveUsersLocation ? (
             <Marker icon={myIcon} position={position}>
               <Popup>
-                {this.state.cur ? (
                   <h5>ตำแหน่งปัจจุบัน</h5>
-                ) : (
-                  <a
-                    href={`https://www.google.com/maps/dir/${cur_lat},${cur_lng}/${
-                      this.state.title
-                    }`}
-                    ref={el => {
-                      if (el) {
-                        this.anchorElement = el;
-                      }
-                    }}
-                  >
-                    <b>{this.state.title}</b>
-                  </a>
-                )}
               </Popup>
             </Marker>
           ) : (
             ""
           )}
+          {markers.map(k => (
+            <MyMarker
+              lat={k.position[0]}
+              lng={k.position[1]}
+              title={k.content}
+            />
+          ))}
         </Map>
         <Card body className="message-form">
           <CardTitle>ค้นหาสถานที่</CardTitle>
@@ -170,6 +265,28 @@ class App extends Component {
             onSelect={value => this.handleClick(value)}
           />
         </Card>
+        <div>
+          <Modal
+            isOpen={this.state.modal}
+            toggle={this.toggle}
+            className={this.props.className}
+          >
+            <ModalHeader toggle={this.toggle}>ข้อมูลสถาที</ModalHeader>
+            <ModalBody>
+              lat:{this.state.location.lat},lng:{this.state.location.lng}
+              <br />
+              {this.state.title}
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={this.toggle}>
+                เพิ่มสถาที
+              </Button>{" "}
+              <Button color="secondary" onClick={this.toggle}>
+                ยกเลิก
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </div>
       </div>
     );
   }
