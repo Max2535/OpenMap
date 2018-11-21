@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Map, TileLayer, Marker, Popup } from "react-leaflet";
+import { Map, TileLayer, Marker, Popup} from "react-leaflet";
 import L from "leaflet";
 import {
   Card,
@@ -8,7 +8,8 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter
+  ModalFooter,
+  Progress
 } from "reactstrap";
 import Autocomplete from "react-autocomplete";
 import "./App.css";
@@ -85,6 +86,7 @@ class App extends Component {
         lat: 0,
         lng: 0
       },
+      style:"block",
       cur: true,
       title: "",
       haveUsersLocation: false,
@@ -102,6 +104,9 @@ class App extends Component {
 
   //ค้นหาตาม lat,lng
   async Search(query) {
+    this.setState({
+      style:"block"
+    });
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${query}&format=json`
     );
@@ -111,6 +116,7 @@ class App extends Component {
         lat: json[0].lat,
         lng: json[0].lon
       },
+      style:null,
       title: json[0].display_name,
       cur: false,
       haveUsersLocation: true,
@@ -273,8 +279,8 @@ class App extends Component {
           >
             <ModalHeader toggle={this.toggle}>ข้อมูลสถาที</ModalHeader>
             <ModalBody>
-              lat:{this.state.location.lat},lng:{this.state.location.lng}
-              <br />
+              lat:{this.state.location.lat},lng:{this.state.location.lng}<br/>
+              <Progress animated value="100" style={{ display: this.state.style ? "display" : "none" }}/>
               {this.state.title}
             </ModalBody>
             <ModalFooter>
