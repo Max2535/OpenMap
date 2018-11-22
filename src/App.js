@@ -42,15 +42,15 @@ let markers = [
   //lat:13.7481758,lng:100.6182162
   {
     position: [13.7481758, 100.6182162],
-    content: "My first popup"
+    content: "สาขาที่ 1"
   },
   {
     position: [13.7484103,100.6207369],
-    content: "My second popup"
+    content: "สาขาที่ 2"
   },
   {
     position: [13.7502752,100.6219909],
-    content: "My third popup"
+    content: "สาขาที่ 3"
   }
 ];
 
@@ -100,6 +100,7 @@ class App extends Component {
     this.getLocation = this.getLocation.bind(this);
     this.toggle = this.toggle.bind(this);
     this.Search = this.Search.bind(this);
+    this.getGeoLocation = this.getGeoLocation.bind(this);
   }
 
   //ค้นหาตาม lat,lng
@@ -139,9 +140,12 @@ class App extends Component {
   }
   //ดึกข้อมูลตำแหน่งปัจจุบัน
   componentDidMount() {
+    this.getGeoLocation();
+  }
+  getGeoLocation(){
     navigator.geolocation.getCurrentPosition(
       position => {
-        console.log("get location from navigator");
+        alert("get location from navigator");
         cur_lat = position.coords.latitude;
         cur_lng = position.coords.longitude;
         this.setState({
@@ -154,7 +158,7 @@ class App extends Component {
         });
       },
       () => {
-        console.log("get location from ip address");
+        alert("get location from ip address");
         fetch("https://ipapi.co/json")
           .then(res => res.json())
           .then(location => {
@@ -172,7 +176,7 @@ class App extends Component {
       }
     );
   }
-  //แสดงผลลัพท์ค้นหาข้อมูลสถานที่ทั่งไป
+  //แสดงผลลัพท์ค้นหาข้อมูลสถานที่ทั่วไป
   handleClick(value) {
     var data = this.state.arr.filter(e => e.display_name === value);
     this.setState({
@@ -254,14 +258,14 @@ class App extends Component {
           ))}
         </Map>
         <Card body className="message-form">
-          <CardTitle>ค้นหาสถานที่</CardTitle>
+          <CardTitle>ค้นหาสถานที่ {"     "}<Button onClick={this.getGeoLocation}>ตำแหน่งปัจจุบัน</Button></CardTitle><br/>
           <Autocomplete
             className="search"
             getItemValue={item => item.display_name}
             items={this.state.arr}
             renderItem={(item, isHighlighted) => (
               <div
-                style={{ background: isHighlighted ? "lightgray" : "white" }}
+                style={{ background: isHighlighted ? "lightgray" : "white"}}
               >
                 {item.display_name}
               </div>
