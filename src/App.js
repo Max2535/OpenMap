@@ -198,8 +198,8 @@ class App extends React.Component {
   handleClickGeo() {
     this.setState({
       location: {
-        cur_lat: this.state.location.cur_lat*1,
-        cur_lng: this.state.location.cur_lng*1
+        cur_lat: this.state.location.cur_lat*1.0,
+        cur_lng: this.state.location.cur_lng*1.0
       },
       zoom: 15
     });
