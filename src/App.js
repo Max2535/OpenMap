@@ -145,7 +145,7 @@ class App extends Component {
   getGeoLocation(){
     navigator.geolocation.getCurrentPosition(
       position => {
-        alert("get location from navigator");
+        console.log("get location from navigator");
         cur_lat = position.coords.latitude;
         cur_lng = position.coords.longitude;
         this.setState({
@@ -158,7 +158,7 @@ class App extends Component {
         });
       },
       () => {
-        alert("get location from ip address");
+        console.log("get location from ip address");
         fetch("https://ipapi.co/json")
           .then(res => res.json())
           .then(location => {
