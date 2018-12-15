@@ -257,8 +257,8 @@ class App extends Component {
             />
           ))}
         </Map>
-        <Card body className="message-form">
-          <CardTitle>ค้นหาสถานที่ {"     "}<Button onClick={this.getGeoLocation}>ตำแหน่งปัจจุบัน</Button></CardTitle><br/>
+        <Card body className="message-form text-center">
+          <CardTitle>ค้นหาสถานที่</CardTitle><br/>
           <Autocomplete
             className="search"
             getItemValue={item => item.display_name}
@@ -274,6 +274,9 @@ class App extends Component {
             onChange={this.handleChange}
             onSelect={value => this.handleClick(value)}
           />
+        </Card>
+        <Card body className="loc">
+        <img src={require('./asset/geo.png')} style={{width:25,height:25}} />
         </Card>
         <div>
           <Modal
