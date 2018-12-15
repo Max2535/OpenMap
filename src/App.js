@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Map, TileLayer, Marker, Popup} from "react-leaflet";
+import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import {
   Card,
@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import Autocomplete from "react-autocomplete";
 import "./App.css";
+import $ from "jquery";
 
 const myIcon = L.icon({
   iconUrl:
@@ -45,16 +46,16 @@ let markers = [
     content: "สาขาที่ 1"
   },
   {
-    position: [13.7484103,100.6207369],
+    position: [13.7484103, 100.6207369],
     content: "สาขาที่ 2"
   },
   {
-    position: [13.7502752,100.6219909],
+    position: [13.7502752, 100.6219909],
     content: "สาขาที่ 3"
   }
 ];
 
-class MyMarker extends Component {
+class MyMarker extends React.Component {
   render() {
     const position = [this.props.lat, this.props.lng];
     console.log(position);
@@ -78,7 +79,7 @@ class MyMarker extends Component {
   }
 }
 
-class App extends Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -86,7 +87,7 @@ class App extends Component {
         lat: 0,
         lng: 0
       },
-      style:"block",
+      style: "block",
       cur: true,
       title: "",
       haveUsersLocation: false,
@@ -95,6 +96,7 @@ class App extends Component {
       value: "",
       arr: [{ display_name: "", lat: 0, lon: 0 }]
     };
+    this.handleClickGeo=this.handleClickGeo.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.getLocation = this.getLocation.bind(this);
@@ -106,7 +108,7 @@ class App extends Component {
   //ค้นหาตาม lat,lng
   async Search(query) {
     this.setState({
-      style:"block"
+      style: "block"
     });
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${query}&format=json`
@@ -117,7 +119,7 @@ class App extends Component {
         lat: json[0].lat,
         lng: json[0].lon
       },
-      style:null,
+      style: null,
       title: json[0].display_name,
       cur: false,
       haveUsersLocation: true,
@@ -140,9 +142,12 @@ class App extends Component {
   }
   //ดึกข้อมูลตำแหน่งปัจจุบัน
   componentDidMount() {
+    $(".map").mousemove(function() {
+      console.log("mousemove");
+    });
     this.getGeoLocation();
   }
-  getGeoLocation(){
+  getGeoLocation() {
     navigator.geolocation.getCurrentPosition(
       position => {
         console.log("get location from navigator");
@@ -190,6 +195,15 @@ class App extends Component {
       zoom: 15
     });
   }
+  handleClickGeo() {
+    this.setState({
+      location: {
+        cur_lat: this.state.location.cur_lat*1,
+        cur_lng: this.state.location.cur_lng*1
+      },
+      zoom: 15
+    });
+  }
   //กรณีที่ค้นหาข้อมูลสถานที่ทั่งไป
   handleChange(event) {
     this.setState({ value: event.target.value });
@@ -227,7 +241,7 @@ class App extends Component {
 
   render() {
     //const position = [this.state.location.lat, this.state.location.lng];
-    const position = [cur_lat,cur_lng];
+    const position = [cur_lat, cur_lng];
     return (
       <div className="map">
         <Map
@@ -243,7 +257,7 @@ class App extends Component {
           {this.state.haveUsersLocation ? (
             <Marker icon={myIcon} position={position}>
               <Popup>
-                  <h5>ตำแหน่งปัจจุบัน</h5>
+                <h5>ตำแหน่งปัจจุบัน</h5>
               </Popup>
             </Marker>
           ) : (
@@ -258,14 +272,15 @@ class App extends Component {
           ))}
         </Map>
         <Card body className="message-form text-center">
-          <CardTitle>ค้นหาสถานที่</CardTitle><br/>
+          <CardTitle>ค้นหาสถานที่</CardTitle>
+          <br />
           <Autocomplete
             className="search"
             getItemValue={item => item.display_name}
             items={this.state.arr}
             renderItem={(item, isHighlighted) => (
               <div
-                style={{ background: isHighlighted ? "lightgray" : "white"}}
+                style={{ background: isHighlighted ? "lightgray" : "white" }}
               >
                 {item.display_name}
               </div>
@@ -276,7 +291,11 @@ class App extends Component {
           />
         </Card>
         <Card body className="loc">
-        <img src={require('./asset/geo.png')} style={{width:25,height:25}} />
+          <img
+            onClick={this.handleClickGeo}
+            src={require("./asset/geo.png")}
+            style={{ width: 25, height: 25 }}
+          />
         </Card>
         <div>
           <Modal
@@ -286,8 +305,13 @@ class App extends Component {
           >
             <ModalHeader toggle={this.toggle}>ข้อมูลสถาที</ModalHeader>
             <ModalBody>
-              lat:{this.state.location.lat},lng:{this.state.location.lng}<br/>
-              <Progress animated value="100" style={{ display: this.state.style ? "display" : "none" }}/>
+              lat:{this.state.location.lat},lng:{this.state.location.lng}
+              <br />
+              <Progress
+                animated
+                value="100"
+                style={{ display: this.state.style ? "display" : "none" }}
+              />
               {this.state.title}
             </ModalBody>
             <ModalFooter>
