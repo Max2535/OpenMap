@@ -9,12 +9,78 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Progress
+  Progress,
+  InputGroupAddon,
+  Input,
+  InputGroup
 } from "reactstrap";
 import Autocomplete from "react-autocomplete";
 import "./App.css";
 import $ from "jquery";
-
+import Select from "react-select";
+//debug
+const scaryAnimals = [
+  {
+    value: "0072b2cd3ca24940b59e3801ed54838b",
+    label: "ดอนเมือง"
+  },
+  {
+    value: "0a451a60e5604ebba056b624891af26e",
+    label: "สุขุมวิท 39"
+  },
+  {
+    value: "0b006a57d99d403daa27e7737cb860ff",
+    label: "เดอะมอลล์บางกะปิ"
+  },
+  {
+    value: "0B49AACD-E14B-446D-B834-4500F02ED8F8",
+    label: "ฟิวเจอร์ปาร์ครังสิต 1"
+  },
+  {
+    value: "0c038e909bc84a7b9fcf1f70ddc9f53a",
+    label: "เซ็นทรัลแจ้งวัฒนะ 1"
+  },
+  {
+    value: "0DA22D5A-82AB-4BA5-91D7-4FD7BEC0F5F1",
+    label: "เดอะมอลล์บางแค"
+  },
+  {
+    value: "117b148cfcde403a9157acc8bc817204",
+    label: "East ville"
+  },
+  {
+    value: "1741A5B2-9FAE-45DE-B9F8-1E1408AD223F",
+    label: "เซ็นทรัลพระราม 9/1"
+  },
+  {
+    value: "19820591-E07E-4E36-B3AB-0310DF3DB2DD",
+    label: "East ville"
+  },
+  {
+    value: "1A19C58F-0A62-493A-B0E4-CF0E91355126",
+    label: "เซ็นทรัลภูเก็ต"
+  },
+  {
+    value: "1c60f7fb7e6544d284aa3d94f2be2614",
+    label: "ฟิวเจอร์ปาร์ครังสิต 4"
+  },
+  {
+    value: "233b72c2c10f455fb5901831d93b3736",
+    label: "ปิ่นเกล้า"
+  },
+  {
+    value: "24048d720c32438b8cbe6fd5a409f550",
+    label: "ฟิวเจอร์ปาร์ครังสิต 1"
+  },
+  {
+    value: "242947A3-545B-4D8C-B42A-0030EC05E20D",
+    label: "ซีคอนศรีนครินทร์"
+  },
+  {
+    value: "2d30cc587cde4bb796b44fa0e50f9a15",
+    label: "Promenade"
+  }
+];
 const myIcon = L.icon({
   iconUrl:
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAFgUlEQVR4Aa1XA5BjWRTN2oW17d3YaZtr2962HUzbDNpjszW24mRt28p47v7zq/bXZtrp/lWnXr337j3nPCe85NcypgSFdugCpW5YoDAMRaIMqRi6aKq5E3YqDQO3qAwjVWrD8Ncq/RBpykd8oZUb/kaJutow8r1aP9II0WmLKLIsJyv1w/kqw9Ch2MYdB++12Onxee/QMwvf4/Dk/Lfp/i4nxTXtOoQ4pW5Aj7wpici1A9erdAN2OH64x8OSP9j3Ft3b7aWkTg/Fm91siTra0f9on5sQr9INejH6CUUUpavjFNq1B+Oadhxmnfa8RfEmN8VNAsQhPqF55xHkMzz3jSmChWU6f7/XZKNH+9+hBLOHYozuKQPxyMPUKkrX/K0uWnfFaJGS1QPRtZsOPtr3NsW0uyh6NNCOkU3Yz+bXbT3I8G3xE5EXLXtCXbbqwCO9zPQYPRTZ5vIDXD7U+w7rFDEoUUf7ibHIR4y6bLVPXrz8JVZEql13trxwue/uDivd3fkWRbS6/IA2bID4uk0UpF1N8qLlbBlXs4Ee7HLTfV1j54APvODnSfOWBqtKVvjgLKzF5YdEk5ewRkGlK0i33Eofffc7HT56jD7/6U+qH3Cx7SBLNntH5YIPvODnyfIXZYRVDPqgHtLs5ABHD3YzLuespb7t79FY34DjMwrVrcTuwlT55YMPvOBnRrJ4VXTdNnYug5ucHLBjEpt30701A3Ts+HEa73u6dT3FNWwflY86eMHPk+Yu+i6pzUpRrW7SNDg5JHR4KapmM5Wv2E8Tfcb1HoqqHMHU+uWDD7zg54mz5/2BSnizi9T1Dg4QQXLToGNCkb6tb1NU+QAlGr1++eADrzhn/u8Q2YZhQVlZ5+CAOtqfbhmaUCS1ezNFVm2imDbPmPng5wmz+gwh+oHDce0eUtQ6OGDIyR0uUhUsoO3vfDmmgOezH0mZN59x7MBi++WDL1g/eEiU3avlidO671bkLfwbw5XV2P8Pzo0ydy4t2/0eu33xYSOMOD8hTf4CrBtGMSoXfPLchX+J0ruSePw3LZeK0juPJbYzrhkH0io7B3k164hiGvawhOKMLkrQLyVpZg8rHFW7E2uHOL888IBPlNZ1FPzstSJM694fWr6RwpvcJK60+0HCILTBzZLFNdtAzJaohze60T8qBzyh5ZuOg5e7uwQppofEmf2++DYvmySqGBuKaicF1blQjhuHdvCIMvp8whTTfZzI7RldpwtSzL+F1+wkdZ2TBOW2gIF88PBTzD/gpeREAMEbxnJcaJHNHrpzji0gQCS6hdkEeYt9DF/2qPcEC8RM28Hwmr3sdNyht00byAut2k3gufWNtgtOEOFGUwcXWNDbdNbpgBGxEvKkOQsxivJx33iow0Vw5S6SVTrpVq11ysA2Rp7gTfPfktc6zhtXBBC+adRLshf6sG2RfHPZ5EAc4sVZ83yCN00Fk/4kggu40ZTvIEm5g24qtU4KjBrx/BTTH8ifVASAG7gKrnWxJDcU7x8X6Ecczhm3o6YicvsLXWfh3Ch1W0k8x0nXF+0fFxgt4phz8QvypiwCCFKMqXCnqXExjq10beH+UUA7+nG6mdG/Pu0f3LgFcGrl2s0kNNjpmoJ9o4B29CMO8dMT4Q5ox8uitF6fqsrJOr8qnwNbRzv6hSnG5wP+64C7h9lp30hKNtKdWjtdkbuPA15nJ7Tz3zR/ibgARbhb4AlhavcBebmTHcFl2fvYEnW0ox9xMxKBS8btJ+KiEbq9zA4RthQXDhPa0T9TEe69gWupwc6uBUphquXgf+/FrIjweHQS4/pduMe5ERUMHUd9xv8ZR98CxkS4F2n3EUrUZ10EYNw7BWm9x1GiPssi3GgiGRDKWRYZfXlON+dfNbM+GgIwYdwAAAAASUVORK5CYII=",
@@ -71,7 +137,7 @@ class MyMarker extends React.Component {
               }
             }}
           >
-            <b>{this.props.title}</b>
+            <b>{this.props.address}</b>
           </a>
         </Popup>
       </Marker>
@@ -89,17 +155,20 @@ class App extends React.Component {
       },
       style: "block",
       cur: true,
-      title: "",
+      address: "",
       haveUsersLocation: false,
       modal: false,
       zoom: 3,
       value: "",
+      branch: "",
+      error: false,
       arr: [{ display_name: "", lat: 0, lon: 0 }]
     };
-    this.handleClickGeo=this.handleClickGeo.bind(this);
+    this.handleClickGeo = this.handleClickGeo.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.getLocation = this.getLocation.bind(this);
+    this.handleChangeBranch = this.handleChangeBranch.bind(this);
     this.toggle = this.toggle.bind(this);
     this.Search = this.Search.bind(this);
     this.getGeoLocation = this.getGeoLocation.bind(this);
@@ -120,17 +189,52 @@ class App extends React.Component {
         lng: json[0].lon
       },
       style: null,
-      title: json[0].display_name,
+      address: json[0].display_name,
       cur: false,
       haveUsersLocation: true,
       zoom: 15
     });
   }
+  handleChangeBranch(value) {
+    this.setState({
+      branch: value.value
+    });
+  }
   //กรณีปิด popup
   toggle() {
-    this.setState({
-      modal: !this.state.modal
-    });
+    if (this.state.branch == "") {
+      this.setState({
+        error: !this.state.error
+      });
+    } else {
+      var obj = {
+        lat: this.state.location.lat,
+        lng: this.state.location.lng,
+        address: this.state.address,
+        branch: this.state.branch
+      };
+      console.log(obj);
+      (async () => {
+        const rawResponse = await fetch("https://httpbin.org/post", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(obj)
+        });
+        const content = await rawResponse.json();
+        this.setState({
+          address: 0,
+          branch: ""
+        });
+        console.log(content);
+      })();
+      this.setState({
+        modal: !this.state.modal
+      });
+      alert("บันทึกข้อมูลสำเร็จ");
+    }
   }
   //กรณีคลิกตามแผนที่
   getLocation(e) {
@@ -171,8 +275,8 @@ class App extends React.Component {
             cur_lng = location.longitude;
             this.setState({
               location: {
-                lat: location.latitude,
-                lng: location.longitude
+                cur_lat: location.latitude,
+                cur_lng: location.longitude
               },
               haveUsersLocation: true,
               zoom: 15
@@ -186,7 +290,7 @@ class App extends React.Component {
     var data = this.state.arr.filter(e => e.display_name === value);
     this.setState({
       cur: false,
-      title: data[0].display_name,
+      address: data[0].display_name,
       location: {
         lat: data[0].lat,
         lng: data[0].lon
@@ -196,10 +300,14 @@ class App extends React.Component {
     });
   }
   handleClickGeo() {
+    console.log(this.state.lat+"++"+cur_lat);
+    if(this.state.location.lat==cur_lat){
+      window.location.reload();
+    }
     this.setState({
       location: {
-        cur_lat: this.state.location.cur_lat*1.0,
-        cur_lng: this.state.location.cur_lng*1.0
+        lat: cur_lat,
+        lng: cur_lng
       },
       zoom: 15
     });
@@ -240,8 +348,8 @@ class App extends React.Component {
   }
 
   render() {
-    //const position = [this.state.location.lat, this.state.location.lng];
-    const position = [cur_lat, cur_lng];
+    const position = [this.state.location.lat, this.state.location.lng];
+    const positionCur = [cur_lat, cur_lng];
     return (
       <div className="map">
         <Map
@@ -255,11 +363,18 @@ class App extends React.Component {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {this.state.haveUsersLocation ? (
-            <Marker icon={myIcon} position={position}>
+            <div>
+            <Marker icon={myIcon} position={positionCur}>
               <Popup>
                 <h5>ตำแหน่งปัจจุบัน</h5>
               </Popup>
             </Marker>
+            <Marker icon={brand} position={position}>
+              <Popup>
+                <h5>ตำแหน่งสาขาที่เลือก</h5>
+              </Popup>
+            </Marker>
+            </div>
           ) : (
             ""
           )}
@@ -267,7 +382,7 @@ class App extends React.Component {
             <MyMarker
               lat={k.position[0]}
               lng={k.position[1]}
-              title={k.content}
+              address={k.content}
             />
           ))}
         </Map>
@@ -303,22 +418,36 @@ class App extends React.Component {
             toggle={this.toggle}
             className={this.props.className}
           >
-            <ModalHeader toggle={this.toggle}>ข้อมูลสถาที</ModalHeader>
+            <ModalHeader toggle={this.toggle}>ข้อมูลที่อยู่สาขา</ModalHeader>
             <ModalBody>
-              lat:{this.state.location.lat},lng:{this.state.location.lng}
-              <br />
+              <Select
+                placeholder={"กรุณาระบุชื่อสาขา"}
+                className="branch"
+                options={scaryAnimals}
+                onChange={value => this.handleChangeBranch(value)}
+              />
+              <p style={{ color: "red", textAlign: "center" }}>
+                {this.state.error ? "กรุณาระบุข้อมูลสาขา" : ""}
+              </p>
               <Progress
                 animated
                 value="100"
                 style={{ display: this.state.style ? "display" : "none" }}
               />
-              {this.state.title}
+              {this.state.address}
             </ModalBody>
             <ModalFooter>
               <Button color="primary" onClick={this.toggle}>
                 เพิ่มสถาที
               </Button>{" "}
-              <Button color="secondary" onClick={this.toggle}>
+              <Button
+                color="secondary"
+                onClick={() =>
+                  this.setState({
+                    modal: false
+                  })
+                }
+              >
                 ยกเลิก
               </Button>
             </ModalFooter>
